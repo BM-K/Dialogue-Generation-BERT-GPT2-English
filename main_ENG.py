@@ -260,6 +260,5 @@ if __name__ == '__main__':
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     train_loader, test_loader, valid_loader, pad_token_idx, gpt_pad_token, bert_tokenizer, data_file_front, gpt_init_token, gpt_eos_token = \
         load_data(args, gpt_tokenizer)
-    print("gpt_pad :", gpt_pad_token)
 
     main(train_loader, test_loader, valid_loader)
