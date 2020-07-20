@@ -1,5 +1,5 @@
 # Dialogue-Generation-BERT-GPT2-English
-
+Small size 'reddit data' was used
 ## How to use
 ```ruby
 git clone https://github.com/BM-K/Dialogue-Generation-BERT-GPT2-English.git
