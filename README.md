@@ -12,3 +12,4 @@ python main_ENG.py
 
 ## Screen after execution
 <img src = "https://user-images.githubusercontent.com/55969260/87901288-9c536080-ca91-11ea-9bae-ebd92cef4b7c.png">
+<img src = "https://user-images.githubusercontent.com/55969260/87901807-f0ab1000-ca92-11ea-9e9b-621b07fcc7e2.png">
