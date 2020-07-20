@@ -5,21 +5,17 @@ import argparse
 import torch.nn as nn
 import torch.optim as optim
 from generation_ENG import inference
-from tensorboardX import SummaryWriter
 from data_loader_ENG_bert import load_data, prepro
 from keyword_matrix_ENG import keyword_loader
 from transformer_based_decoder_ENG import Transformer
 from gpt_model_ENG import GPT2, gpt_tokenizer
 from matrix_ENG import acc, epoch_time, test_time_visual
-from transformer_based_decoder_PALs import Transformer_PALs
 from utils import get_target, get_dec_inputs, get_segment_ids_vaild_len, gen_attention_mask
 
 SEED = 1234
 torch.manual_seed(SEED)
 torch.backends.cudnn.deterministic = True
-#to = torch.tensor([9776, 326, 257])
-#print(gpt_tokenizer.convert_ids_to_tokens(to))
-#exit()
+
 
 def define_args(parser):
     parser.add_argument('--max_len', type=int, default=64)
