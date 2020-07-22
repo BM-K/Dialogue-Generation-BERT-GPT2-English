@@ -90,7 +90,7 @@ def keyword_loader(args, task):
     category = 'reddit'
 
     with open(f'reddit_mini_keyword/N_reddit_mini_keyword.{task}', "r", encoding="utf-8-sig") as f:
-        #print(f'--read keyword-- \n{category}_keyword/{category}.{task}\n')
+        print(f'--read keyword-- \n{category}.{task}\n')
         lines = f.readlines()
         lines_len = len(lines)
         for line in lines:
