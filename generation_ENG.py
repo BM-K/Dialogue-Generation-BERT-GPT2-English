@@ -1,14 +1,14 @@
 import math
 import copy
 import torch
-from chatspace import ChatSpace
+#from chatspace import ChatSpace
 import nltk.translate.bleu_score as bleu
 from keyword_matrix_ENG import keyword_loader
 from data_loader_ENG_bert import bert_tokenizer, prepro
 from gpt_model_ENG import GPT2, gpt_tokenizer
 #from utils import get_segment_ids_vaild_len, gen_attention_mask
 
-spacer = ChatSpace()
+#spacer = ChatSpace()
 
 init_token = bert_tokenizer.cls_token
 pad_token = bert_tokenizer.pad_token
