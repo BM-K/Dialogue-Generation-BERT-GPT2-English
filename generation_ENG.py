@@ -1,3 +1,4 @@
+import math
 import copy
 import torch
 from chatspace import ChatSpace
@@ -94,20 +95,31 @@ def infer_test_set(model, gpt_model, args, data_file_front):
     valid_Q_list = []
     valid_A_list = []
     valid_P_list = []
+
     with open(f'{args.data_dir}/{valid_data_}', "r", encoding="utf-8") as f:
         lines = f.readlines()
+        all_val_len = len(lines)
+        
         for line in lines:
             data_split = line.split('\t')
             q, a = data_split[0], data_split[1].strip()
             valid_data_list.append([q, a])
 
     data_len = 0
-
-    keyword = keyword_loader(args, 'test')
-    for step in range(len(keyword)):
+    
+    if args.useKey == 'True':
+        keyword = keyword_loader(args, 'test')
+    all_len = all_val_len
+    all_val_len = math.ceil(all_val_len / args.batch_size)
+    
+    for step in range(all_val_len):  # len(keyword)
         batch_step = 0
-        max_batch_len = len(keyword[step])
-
+        
+        if step+1 == all_val_len:
+            max_batch_len = all_len - args.batch_size * step
+        else:
+            max_batch_len = args.batch_size#len(keyword[step])
+    
         for qaidx in range(max_batch_len):
 
             input_sentence = valid_data_list[data_len][0]
@@ -136,8 +148,12 @@ def infer_test_set(model, gpt_model, args, data_file_front):
             for i in range(args.max_len):
                 with torch.no_grad():
                     dec_in = gpt_model(dec_inputs.cpu())
-
-                y_pred = model(enc_inputs, dec_in, None)  # [keyword[step][batch_step]])
+                
+                if args.useKey == 'True' or args.useKeyLayer == 'True':
+                    y_pred = model(enc_inputs, dec_in, [keyword[step][batch_step]])
+                else:
+                    y_pred = model(enc_inputs, dec_in, None)
+                
                 y_pred_ids = y_pred.max(dim=-1)[1]
                 
                 if (y_pred_ids[-1] == gpt_eos_token):

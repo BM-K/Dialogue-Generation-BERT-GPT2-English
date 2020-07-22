@@ -93,13 +93,13 @@ class DecoderLayer(nn.Module):
     def __init__(self, args):
         super(DecoderLayer, self).__init__()
         self.dec_enc_attn = MultiheadAttention(args)
-        #self.dec_enc_keyword_attn = MultiheadAttention(args)
+        self.dec_enc_keyword_attn = MultiheadAttention(args)
         self.pos_ffn = PoswiseFeedForwardNet(args)
 
-    def forward(self, dec_inputs, enc_outputs, dec_self_attn_mask, dec_enc_attn_mask):
+    def forward(self, dec_inputs, enc_outputs, keyword, dec_self_attn_mask, dec_enc_attn_mask):
                 
         dec_outputs, dec_enc_attn = self.dec_enc_attn(dec_inputs, enc_outputs, enc_outputs, dec_enc_attn_mask)
-        #dec_outputs, _ = self.dec_enc_keyword_attn(dec_outputs, keyword, keyword, None)
+        dec_outputs, _ = self.dec_enc_keyword_attn(dec_outputs, keyword, keyword, None)
         
         with torch.no_grad():
             dec_outputs = self.pos_ffn(dec_outputs)
@@ -111,11 +111,11 @@ class Decoder(nn.Module):
         super(Decoder, self).__init__()
         self.layers = nn.ModuleList([DecoderLayer(args) for _ in range(args.n_layers)])
 
-    def forward(self, dec_inputs, enc_outputs):  # dec_inputs : [batch_size x target_len]
+    def forward(self, dec_inputs, enc_outputs, keyword):  # dec_inputs : [batch_size x target_len]
     
         for layer in self.layers:
             dec_outputs = \
-                layer(dec_inputs, enc_outputs, dec_self_attn_mask=None, dec_enc_attn_mask=None)
+                layer(dec_inputs, enc_outputs, keyword, dec_self_attn_mask=None, dec_enc_attn_mask=None)
             
         return dec_outputs
 
@@ -151,9 +151,9 @@ class ENG_BERT(nn.Module):
         return embedded
 
     
-class Transformer(nn.Module):
+class Transformer_layer(nn.Module):
     def __init__(self, cache_dir, args):
-        super(Transformer, self).__init__()
+        super(Transformer_layer, self).__init__()
         self.args = args
         bert = BertModel.from_pretrained('bert-base-uncased')
         self.bert = ENG_BERT(bert, 768 , 0.1)
@@ -162,12 +162,14 @@ class Transformer(nn.Module):
 
     def forward(self, enc_inputs, dec_inputs, keyword_):
         bert_encoding_vec = self.bert(enc_inputs)
-        
-        with torch.no_grad():
-            if keyword_ is not None:
-                bert_encoding_vec = keyword(self.args, bert_encoding_vec, keyword_)
-      
-        dec_outputs = self.decoder(dec_inputs, bert_encoding_vec) 
+
+        if self.args.useKey == 'True' and self.args.useKeyLayer == 'True':
+            keyword = for_addition_layer(self.args, keyword_)
+        else:
+            print("if you want to use key layer, args.useKey option and args.useKeyLayer option are True")
+            exit()
+
+        dec_outputs = self.decoder(dec_inputs, bert_encoding_vec, keyword)
         dec_logits = self.projection(dec_outputs)  # dec_logits : [batch_size x src_vocab_size x tgt_vocab_size]
         
         return dec_logits.view(-1, dec_logits.size(-1))
