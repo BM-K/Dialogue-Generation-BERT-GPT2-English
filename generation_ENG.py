@@ -100,8 +100,6 @@ def infer_test_set(model, gpt_model, args, data_file_front):
         lines = f.readlines()
         all_val_len = len(lines)
         
-        all_val_len = len(lines)
-        
         for line in lines:
             data_split = line.split('\t')
             q, a = data_split[0], data_split[1].strip()
